@@ -1,0 +1,81 @@
+---
+import { getEntry } from 'astro:content';
+import { ClientRouter } from 'astro:transitions';
+import Icon from '../components/Icon.astro';
+import BrandIcon from '../components/BrandIcon.astro';
+import '../styles/global.css';
+interface Props { title: string; description: string; active?: string; }
+const { title, description, active = '' } = Astro.props;
+const home = await getEntry('pages', 'home');
+const profile = home!.data;
+const siteName = profile.siteName || profile.name;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const pageTitle = title === profile.name ? siteName : `${title} — ${profile.name}`;
+const socialNames = { github: 'GitHub', youtube: 'YouTube', soundcloud: 'SoundCloud', bilibili: 'Bilibili' };
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#ffffff" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={siteName} />
+    <meta name="twitter:card" content="summary" />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{pageTitle}</title>
+    <script is:inline>
+      (() => {
+        let preference;
+        try { preference = localStorage.getItem('theme'); } catch {}
+        const dark = preference === 'dark' || (preference !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#0b0b0b' : '#ffffff');
+      })();
+    </script>
+    <ClientRouter />
+  </head>
+  <body>
+    <a href="#main" class="skip-link">Skip to content</a>
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="wordmark" href="/" aria-label={`${siteName} — home`}>{siteName}</a>
+        <nav aria-label="Main navigation">
+          <a href="/" aria-current={active === 'home' ? 'page' : undefined}>Home</a>
+          <a href="/gallery/" aria-current={active === 'gallery' ? 'page' : undefined}>Gallery</a>
+          <a href="/contact/" aria-current={active === 'contact' ? 'page' : undefined}>Contact &amp; CV</a>
+          <span class="nav-tooltip">
+            <a href="https://note.gorco.me" target="_blank" rel="noopener noreferrer" aria-describedby="notes-tooltip">Course Notes<Icon name="arrow" size={13} /></a>
+            <span id="notes-tooltip" class="nav-tooltip-text" role="tooltip">Personal notebook site written mainly in Chinese</span>
+          </span>
+          <span class="nav-tooltip">
+            <a href="https://blog.gorco.me" target="_blank" rel="noopener noreferrer" aria-describedby="blog-tooltip">Blog<Icon name="arrow" size={13} /></a>
+            <span id="blog-tooltip" class="nav-tooltip-text" role="tooltip">Personal Blog site written mainly in Chinese</span>
+          </span>
+          <a href="/hobby/" aria-current={active === 'hobby' ? 'page' : undefined}>Hobby</a>
+          <button class="icon-button search-trigger" type="button" aria-label="Search this site" title="Search this site"><Icon name="search" size={19} /><kbd data-search-shortcut>Ctrl K</kbd></button>
+        </nav>
+      </header>
+      <main id="main" tabindex="-1"><slot /></main>
+      <footer class="site-footer">
+        <span class="copyright">© {new Date().getFullYear()} {profile.name}</span>
+        <nav class="social-links" aria-label="Social links">
+          {profile.socials.map(social => <a href={social.link} target="_blank" rel="noopener noreferrer" aria-label={socialNames[social.icon]} title={socialNames[social.icon]}><BrandIcon name={social.icon} /></a>)}
+        </nav>
+      </footer>
+    </div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch color theme"><span class="moon"><Icon name="moon" size={19} /></span><span class="sun"><Icon name="sun" size={19} /></span></button>
+    <dialog id="search-dialog" aria-labelledby="search-heading">
+      <div class="search-heading"><h2 id="search-heading">Search this site</h2><button class="icon-button" id="close-search" aria-label="Close search" type="button"><Icon name="close" size={20} /></button></div>
+      <div class="search-input-wrap"><Icon name="search" size={20} /><input id="search-input" type="search" placeholder="Find a page, an idea, a link…" aria-label="Search query" autocomplete="off" /></div>
+      <div id="search-results" class="search-results" aria-live="polite"></div>
+      <div class="search-help"><span><kbd data-search-shortcut>Ctrl K</kbd> toggle search</span><span><kbd>Esc</kbd> close</span></div>
+    </dialog>
+    <script src="../scripts/interactions.ts"></script>
+  </body>
+</html>

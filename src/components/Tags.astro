@@ -1,0 +1,6 @@
+---
+interface Props { tags: string[]; }
+---
+{Astro.props.tags.length > 0 && <div class="item-tags">
+  {[...new Set(Astro.props.tags)].map(tag => <button type="button" data-filter={tag.toLowerCase()} aria-label={`Filter by ${tag}`}>{tag}</button>)}
+</div>}

@@ -1,0 +1,24 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import TaggedContent from '../components/TaggedContent.astro';
+import Tags from '../components/Tags.astro';
+const items = (await getCollection('publications', ({ data }) => !data.draft)).sort((a, b) => b.data.year - a.data.year || a.data.title.localeCompare(b.data.title));
+---
+<Layout title="Publications" description="Publications by Jin Cao.">
+  <article class="article-page publications-page">
+    <h1>Publications</h1>
+    {items.length ? <TaggedContent tags={items.flatMap(item => item.data.tags)} label="Publications">
+      <div class="publication-list">
+        {items.map(item => <article class="publication-item" data-tag-item data-tags={JSON.stringify(item.data.tags.map(tag => tag.toLowerCase()))}>
+          <h2><a href={`/publications/${item.id}/`}>{item.data.title}</a></h2>
+          {item.data.authors.length > 0 && <p>{item.data.authors.join(', ')}</p>}
+          <p class="publication-venue">{[item.data.venue, item.data.year].filter(Boolean).join(' · ')}</p>
+          {item.data.description && <p>{item.data.description}</p>}
+          {item.data.links.length > 0 && <div class="publication-links">{item.data.links.map(link => <a href={link.href} target="_blank" rel="noopener noreferrer">{link.label} ↗</a>)}</div>}
+          <Tags tags={item.data.tags} />
+        </article>)}
+      </div>
+    </TaggedContent> : <p class="empty-content">No publications listed yet.</p>}
+  </article>
+</Layout>

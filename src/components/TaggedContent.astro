@@ -1,0 +1,16 @@
+---
+interface Props { tags: string[]; label: string; }
+const { tags, label } = Astro.props;
+const unique = new Map<string, string>();
+for (const tag of tags) if (!unique.has(tag.toLowerCase())) unique.set(tag.toLowerCase(), tag);
+const choices = [...unique.entries()].sort((a, b) => a[1].localeCompare(b[1]));
+---
+<section class="tagged-content" data-tag-filter aria-label={label}>
+  {choices.length > 0 && <div class="tag-filters" role="group" aria-label={`Filter ${label.toLowerCase()} by tag`}>
+    <button type="button" data-filter="" aria-pressed="true">All</button>
+    {choices.map(([value, title]) => <button type="button" data-filter={value} aria-pressed="false">{title}</button>)}
+  </div>}
+  <slot />
+  <p class="filter-empty" role="status" hidden>No items with this tag.</p>
+  <span class="sr-only filter-status" role="status" aria-live="polite"></span>
+</section>

@@ -1,0 +1,9 @@
+---
+import { faGithub, faYoutube, faSoundcloud, faBilibili } from '@fortawesome/free-brands-svg-icons';
+interface Props { name: 'github' | 'youtube' | 'soundcloud' | 'bilibili'; }
+const icons = { github: faGithub, youtube: faYoutube, soundcloud: faSoundcloud, bilibili: faBilibili };
+const [width, height, , , path] = icons[Astro.props.name].icon;
+---
+<svg width="20" height="20" viewBox={`0 0 ${width} ${height}`} fill="currentColor" aria-hidden="true">
+  {Array.isArray(path) ? path.map(d => <path d={d} />) : <path d={path} />}
+</svg>

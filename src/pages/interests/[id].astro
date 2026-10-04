@@ -1,0 +1,11 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+export async function getStaticPaths() {
+  const cards = await getCollection('cards', ({ data }) => !data.draft && !data.href);
+  return cards.map(card => ({ params: { id: card.id }, props: { card } }));
+}
+const { card } = Astro.props;
+const { Content } = await render(card);
+---
+<Layout title={card.data.title} description={card.data.description}><article class="article-page"><span class="eyebrow">{card.data.label}</span><h1>{card.data.title}</h1><p class="tagline">{card.data.description}</p><div class="prose article-prose"><Content /></div><a class="text-link back-link" href="/">Back home →</a></article></Layout>

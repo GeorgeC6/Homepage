@@ -1,0 +1,42 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import TaggedContent from '../components/TaggedContent.astro';
+import GalleryPhoto from '../components/GalleryPhoto.astro';
+const gallery = await getEntry('pages', 'gallery');
+const entries = await getCollection('gallery', ({ data }) => !data.draft);
+const items = [
+  ...entries.map(entry => ({
+    image: entry.data.image, alt: entry.data.imageAlt || entry.data.title,
+    title: entry.data.title, description: entry.data.description, date: entry.data.date,
+    format: entry.data.format, tags: entry.data.tags, order: entry.data.order,
+    href: entry.data.href || (entry.body?.trim() ? `/gallery/${entry.id}/` : undefined),
+  })),
+  ...gallery!.data.photos.map(photo => ({
+    image: photo.src, alt: photo.alt, title: '', description: photo.caption || '',
+    date: photo.date, format: photo.format, tags: photo.tags, order: 0, href: photo.href,
+  })),
+].sort((a, b) => (b.date || '').localeCompare(a.date || '') || a.order - b.order);
+const groups = new Map<string, typeof items>();
+for (const item of items) {
+  const month = item.date?.slice(0, 7) || 'undated';
+  if (!groups.has(month)) groups.set(month, []);
+  groups.get(month)!.push(item);
+}
+const monthName = (month: string) => new Date(`${month}-01T12:00:00Z`).toLocaleDateString('en', { month: 'short', timeZone: 'UTC' });
+---
+<Layout title={gallery!.data.title} description={gallery!.data.description} active="gallery">
+  <article class="article-page gallery-page">
+    <h1>{gallery!.data.title}</h1>
+    {items.length > 0 && <TaggedContent tags={items.flatMap(item => item.tags)} label="Gallery">
+      <div class="gallery-timeline">
+        {[...groups].map(([month, photos]) => <section class="timeline-group" data-tag-group aria-label={month === 'undated' ? 'Undated photographs' : month}>
+          <div class="timeline-date">
+            {month === 'undated' ? <span>Undated</span> : <time datetime={month}><strong>{month.slice(0, 4)}</strong><span>{monthName(month)}</span></time>}
+          </div>
+          <div class="gallery-mosaic">{photos.map(photo => <GalleryPhoto {...photo} />)}</div>
+        </section>)}
+      </div>
+    </TaggedContent>}
+  </article>
+</Layout>

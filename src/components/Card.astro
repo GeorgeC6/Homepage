@@ -1,0 +1,14 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Icon from './Icon.astro';
+interface Props { card: CollectionEntry<'cards'>; }
+const { card } = Astro.props;
+const href = card.data.href || `/interests/${card.id}/`;
+const external = /^https?:\/\//.test(href);
+---
+<a class="link-card" href={href} target={external ? '_blank' : undefined} rel={external ? 'noopener noreferrer' : undefined}>
+  <div class="card-top"><span class="card-icon"><Icon name={card.data.icon} size={23} /></span><Icon name={external ? 'arrow' : 'right'} size={18} class="card-arrow" /></div>
+  <h3>{card.data.title}</h3>
+  <p>{card.data.description}</p>
+  <span class="card-label">{card.data.label}</span>
+</a>

@@ -1,0 +1,9 @@
+---
+import { getEntry, render } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+const hobby = await getEntry('pages', 'hobby');
+const { Content } = await render(hobby!);
+---
+<Layout title={hobby!.data.title} description={hobby!.data.description} active="hobby">
+  <article class="article-page"><h1>{hobby!.data.title}</h1><div class="prose article-prose"><Content /></div></article>
+</Layout>

@@ -1,0 +1,19 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+export async function getStaticPaths() {
+  return (await getCollection('gallery', entry => !entry.data.draft && !entry.data.href && Boolean(entry.body?.trim()))).map(entry => ({ params: { id: entry.id }, props: { entry } }));
+}
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+<Layout title={entry.data.title} description={entry.data.description} active="gallery">
+  <article class="article-page">
+    <a class="back-link" href="/gallery/">← Gallery</a>
+    <h1>{entry.data.title}</h1>
+    <div class="prose article-prose">
+      {entry.data.image && <img src={entry.data.image} alt={entry.data.imageAlt || entry.data.title} />}
+      <Content />
+    </div>
+  </article>
+</Layout>
