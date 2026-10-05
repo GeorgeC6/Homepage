@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
+import ResponsiveImage from '../../components/ResponsiveImage.astro';
 export async function getStaticPaths() {
   return (await getCollection('gallery', entry => !entry.data.draft && !entry.data.href && Boolean(entry.body?.trim()))).map(entry => ({ params: { id: entry.id }, props: { entry } }));
 }
@@ -12,7 +13,7 @@ const { Content } = await render(entry);
     <a class="back-link" href="/gallery/">← Gallery</a>
     <h1>{entry.data.title}</h1>
     <div class="prose article-prose">
-      {entry.data.image && <img src={entry.data.image} alt={entry.data.imageAlt || entry.data.title} />}
+      <ResponsiveImage src={entry.data.image} alt={entry.data.imageAlt || entry.data.title} sizes="(max-width: 740px) calc(100vw - 32px), 700px" loading="eager" />
       <Content />
     </div>
   </article>

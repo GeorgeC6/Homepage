@@ -193,3 +193,25 @@ kbd { font-family: inherit; font-size: 11px; line-height: 1.5; border: 1px solid
 .gallery-visual:is(:hover, :focus-visible) img { transform: scale(1.025); }
 @media (max-width: 900px) { .gallery-mosaic { columns: 2; } }
 @media (max-width: 600px) { .gallery-timeline { --timeline-rail: 48px; --timeline-gap: 18px; } .gallery-mosaic { columns: 1; } .timeline-date { font-size: 11px; } .timeline-date strong { font-size: 13px; } .timeline-group { padding-bottom: 22px; } }
+
+.header-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.main-nav { margin-left: auto; }
+.menu-toggle { display: none; align-items: center; justify-content: center; gap: 6px; background: transparent; border: 0; padding: 8px 3px; color: var(--heading); font-size: 14px; }
+[data-shortcuts='off'] .search-help { display: none; }
+@media (hover: none) and (pointer: coarse) { [data-search-shortcut], .search-help { display: none; } }
+@media (max-width: 600px) {
+  .site-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; position: relative; gap: 6px; padding: 22px 0 8px; }
+  .wordmark { width: auto; white-space: nowrap; font-size: clamp(16px, 5vw, 20px); letter-spacing: -.7px; }
+  .header-actions { gap: 6px; }
+  .menu-toggle { display: inline-flex; min-height: 40px; }
+  .header-actions .search-trigger { width: 36px; height: 40px; padding: 8px; }
+  [data-search-shortcut], .search-help { display: none; }
+  .main-nav { display: none; position: absolute; top: calc(100% + 8px); left: 0; right: 0; width: auto; margin: 0; padding: 12px 18px; flex-direction: column; align-items: stretch; gap: 0; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); box-shadow: 0 8px 24px #0000000a; z-index: 30; }
+  .site-header[data-menu-open='true'] .main-nav { display: flex; }
+  .main-nav a { padding: 10px 0; font-size: 15px; }
+  .main-nav a[aria-current]::after { display: none; }
+  .main-nav .nav-tooltip { width: 100%; }
+  .portrait { align-items: center; justify-self: center; }
+  .intro { padding-top: 32px; }
+  #search-input { font-size: 16px; }
+}

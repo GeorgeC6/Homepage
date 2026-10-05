@@ -1,4 +1,5 @@
 ---
+import ResponsiveImage from './ResponsiveImage.astro';
 interface Props {
   image: string; alt: string; title: string; description: string;
   href?: string; format: string; tags: string[];
@@ -10,7 +11,7 @@ const external = /^https?:\/\//.test(href || '');
 ---
 <figure class="gallery-photo" data-tag-item data-tags={JSON.stringify(tags.map(tag => tag.toLowerCase()))}>
   <Tag class:list={['gallery-visual', `gallery-format-${format}`]} href={href} type={!href && hasIntro ? 'button' : undefined} target={external ? '_blank' : undefined} rel={external ? 'noopener noreferrer' : undefined} aria-label={title || alt} aria-expanded={!href && hasIntro ? 'false' : undefined} data-gallery-preview={!href && hasIntro ? '' : undefined}>
-    <img src={image} alt={alt} loading="lazy" decoding="async" />
+    <ResponsiveImage src={image} alt={alt} sizes="(max-width: 600px) calc(100vw - 98px), (max-width: 900px) 40vw, 320px" maxWidth={800} />
     {(title || description) && <span class="gallery-overlay">
       {title && <strong>{title}</strong>}
       {description && <span>{description}</span>}

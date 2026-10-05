@@ -57,6 +57,12 @@ avatarCrop:
 
 Increase `scale` to zoom in; negative offsets move the image left or up. Omit `avatarCrop` to use the image at frame width with no offset.
 
+### Automatic image optimization
+
+`npm run dev` and `npm run build` first run `npm run images`. This scans JPEG, PNG, WebP, AVIF, and TIFF files under `public/images/`, then generates cached 400px, 800px, and 1280px WebP variants in `public/_optimized/` without upscaling. Animated images are left unchanged. Generated files are ignored by Git and recreated in CI; source files stay unchanged.
+
+The homepage portrait, gallery thumbnails, and gallery detail images automatically use responsive variants. The portrait loads eagerly with high priority; gallery thumbnails load lazily. Photos inserted with raw Markdown image syntax still use their original URL. Add new images before starting the dev server, or rerun `npm run images` and restart the server after adding them. Modified images get new content-hashed URLs, and unchanged variants are reused.
+
 Put your CV at `public/cv.pdf`, then set `cv: /cv.pdf` in `home.md`. Files in `public/` are served at the root URL. Until a CV is configured, the portrait's CV link opens the CV section of the Contact & CV page. There is no placeholder PDF or broken download link.
 
 ### Gallery
@@ -109,6 +115,8 @@ The entry appears in search and creates an `/interests/example/` page. Home cont
 ### Search and appearance
 
 The search index is generated from Markdown on every build. Search covers Home, Gallery, Contact & CV, Hobby, personal pages, publications, tags, and the titles/descriptions of external entries. It does not crawl the separate notes/blog websites. Open or close it with `⌘ K` on macOS or `Ctrl K` on Windows/Linux; `Esc` closes it. The navigation button and search dialog show the appropriate shortcut for the visitor's system.
+
+Phone layouts center the portrait and collapse navigation into a **Menu** button next to a separate search icon. The menu closes on navigation, outside clicks, opening search, or Escape. Touch devices hide keyboard shortcut hints, including iPad Safari's desktop user-agent mode.
 
 Styles are in `src/styles/global.css`. The site follows the operating system's theme initially and remembers manual changes. The round switch is fixed at the bottom right. Layouts adapt to mobile screens and respect reduced-motion preferences. Google Fonts are optional; system fonts work if the request is unavailable.
 

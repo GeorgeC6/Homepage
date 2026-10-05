@@ -2,14 +2,17 @@
 import { getEntry, render } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import Icon from '../components/Icon.astro';
+import ResponsiveImage from '../components/ResponsiveImage.astro';
 const home = await getEntry('pages', 'home');
 const { Content } = await render(home!);
 const profile = home!.data;
+const scale = profile.avatarCrop?.scale || 1;
+const avatarSizes = `(max-width: 600px) ${160 * scale}px, (max-width: 900px) ${176 * scale}px, ${208 * scale}px`;
 ---
 <Layout title={profile.title} description={profile.description} active="home">
   <section class="intro" aria-label="About me">
     <aside class="portrait">
-      <div class="portrait-frame" style={`--portrait-scale: ${profile.avatarCrop?.scale || 1}; --portrait-x: ${profile.avatarCrop?.x || 0}%; --portrait-y: ${profile.avatarCrop?.y || 0}%`}><img src={profile.avatar} alt={profile.avatarAlt || `Portrait of ${profile.name}`} width="208" height="208" /></div>
+      <div class="portrait-frame" style={`--portrait-scale: ${scale}; --portrait-x: ${profile.avatarCrop?.x || 0}%; --portrait-y: ${profile.avatarCrop?.y || 0}%`}><ResponsiveImage src={profile.avatar!} alt={profile.avatarAlt || `Portrait of ${profile.name}`} sizes={avatarSizes} maxWidth={800} loading="eager" priority /></div>
       <strong class="portrait-name">{profile.name}</strong>
       <div class="portrait-links">
         {profile.email && <a href={`mailto:${profile.email}`}><Icon name="mail" size={17} />Email</a>}

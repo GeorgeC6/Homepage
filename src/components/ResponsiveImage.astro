@@ -1,0 +1,17 @@
+---
+import { readFileSync, existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+interface Props {
+  src: string; alt: string; sizes?: string; maxWidth?: number;
+  loading?: 'lazy' | 'eager'; priority?: boolean;
+}
+type Variant = { src: string; width: number; height: number };
+const { src, alt, sizes = '100vw', maxWidth = 1280, loading = 'lazy', priority = false } = Astro.props;
+const file = resolve('public/_optimized/manifest.json');
+const manifest: Record<string, Variant[]> = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : {};
+const available = manifest[src] || [];
+const variants = available.filter(image => image.width <= maxWidth);
+if (!variants.length && available.length) variants.push(available[0]);
+const image = variants.at(-1);
+---
+<img src={image?.src || src} srcset={variants.length ? variants.map(image => `${image.src} ${image.width}w`).join(', ') : undefined} sizes={image ? sizes : undefined} width={image?.width} height={image?.height} alt={alt} loading={loading} decoding="async" fetchpriority={priority ? 'high' : undefined} />

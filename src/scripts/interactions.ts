@@ -31,12 +31,28 @@ function positionTooltip(wrapper: HTMLElement) {
 function setup() {
   applyTheme();
   const platform = (navigator as Navigator & { userAgentData?: { platform?: string } }).userAgentData?.platform || '';
-  const shortcut = searchShortcut(platform, navigator.userAgent);
-  document.querySelectorAll('[data-search-shortcut]').forEach(hint => { hint.textContent = shortcut.label; });
+  const shortcut = searchShortcut(platform, navigator.userAgent, navigator.maxTouchPoints);
+  document.documentElement.dataset.shortcuts = shortcut ? 'on' : 'off';
+  document.querySelectorAll<HTMLElement>('[data-search-shortcut]').forEach(hint => {
+    hint.hidden = !shortcut;
+    hint.textContent = shortcut?.label || '';
+  });
   const searchButton = document.querySelector('.search-trigger');
-  searchButton?.setAttribute('title', `Search (${shortcut.label})`);
-  searchButton?.setAttribute('aria-label', `Search this site (${shortcut.label})`);
-  searchButton?.setAttribute('aria-keyshortcuts', shortcut.keys);
+  searchButton?.setAttribute('title', shortcut ? `Search (${shortcut.label})` : 'Search this site');
+  searchButton?.setAttribute('aria-label', shortcut ? `Search this site (${shortcut.label})` : 'Search this site');
+  if (shortcut) searchButton?.setAttribute('aria-keyshortcuts', shortcut.keys);
+  else searchButton?.removeAttribute('aria-keyshortcuts');
+  const header = document.querySelector<HTMLElement>('.site-header')!;
+  const menu = document.querySelector<HTMLButtonElement>('.menu-toggle')!;
+  menu.addEventListener('click', () => {
+    const open = menu.getAttribute('aria-expanded') !== 'true';
+    menu.setAttribute('aria-expanded', String(open));
+    header.dataset.menuOpen = String(open);
+    if (open) header.querySelector<HTMLAnchorElement>('.main-nav a')?.focus();
+  });
+  header.querySelector('.main-nav')?.addEventListener('click', event => {
+    if ((event.target as Element).closest('a')) closeMenu();
+  });
   document.querySelectorAll<HTMLElement>('[data-tag-filter]').forEach(section => {
     section.addEventListener('click', event => {
       const button = (event.target as Element).closest<HTMLButtonElement>('button[data-filter]');
@@ -120,6 +136,8 @@ function setup() {
   }
   async function openSearch() {
     if (dialog.open) return;
+    closeMenu();
+    (searchButton as HTMLButtonElement)?.focus();
     dialog.showModal();
     input.value = '';
     input.focus();
@@ -147,6 +165,14 @@ function setup() {
   dialog.addEventListener('cancel', event => { event.preventDefault(); dialog.close(); });
 }
 
+function closeMenu(restoreFocus = false) {
+  const menu = document.querySelector<HTMLButtonElement>('.menu-toggle');
+  if (menu?.getAttribute('aria-expanded') !== 'true') return;
+  menu.setAttribute('aria-expanded', 'false');
+  document.querySelector<HTMLElement>('.site-header')!.dataset.menuOpen = 'false';
+  if (restoreFocus) menu.focus();
+}
+
 document.addEventListener('astro:page-load', setup);
 document.addEventListener('astro:before-swap', (event) => {
   const next = (event as Event & { newDocument: Document }).newDocument;
@@ -161,6 +187,7 @@ document.addEventListener('keydown', event => {
     dialog.close();
     return;
   }
+  if (event.key === 'Escape') closeMenu(true);
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
     event.preventDefault();
     if (dialog?.open) dialog.close();
@@ -169,4 +196,10 @@ document.addEventListener('keydown', event => {
 }, { capture: true });
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (!savedTheme()) applyTheme(); });
 window.addEventListener('storage', event => { if (event.key === 'theme') applyTheme(); });
-window.addEventListener('resize', () => document.querySelectorAll<HTMLElement>('.nav-tooltip').forEach(positionTooltip));
+document.addEventListener('pointerdown', event => {
+  if (!(event.target as Element).closest('.site-header')) closeMenu();
+});
+window.addEventListener('resize', () => {
+  document.querySelectorAll<HTMLElement>('.nav-tooltip').forEach(positionTooltip);
+  if (!matchMedia('(max-width: 600px)').matches) closeMenu();
+});

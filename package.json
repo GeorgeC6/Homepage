@@ -7,17 +7,22 @@
     "node": ">=22.12.0"
   },
   "scripts": {
+    "images": "node scripts/optimize-images.mjs",
+    "predev": "npm run images",
     "dev": "astro dev",
+    "prebuild": "npm run images",
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check"
   },
   "dependencies": {
     "@fortawesome/free-brands-svg-icons": "^7.3.1",
-    "astro": "^7.3.5"
+    "astro": "^7.3.5",
+    "sharp": "^0.35.5"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
+    "@types/node": "^24.19.1",
     "typescript": "^5.9.3"
   }
 }

@@ -45,7 +45,7 @@ const socialNames = { github: 'GitHub', youtube: 'YouTube', soundcloud: 'SoundCl
     <div class="site-shell">
       <header class="site-header">
         <a class="wordmark" href="/" aria-label={`${siteName} — home`}>{siteName}</a>
-        <nav aria-label="Main navigation">
+        <nav id="main-navigation" class="main-nav" aria-label="Main navigation">
           <a href="/" aria-current={active === 'home' ? 'page' : undefined}>Home</a>
           <a href="/gallery/" aria-current={active === 'gallery' ? 'page' : undefined}>Gallery</a>
           <a href="/contact/" aria-current={active === 'contact' ? 'page' : undefined}>Contact &amp; CV</a>
@@ -58,8 +58,11 @@ const socialNames = { github: 'GitHub', youtube: 'YouTube', soundcloud: 'SoundCl
             <span id="blog-tooltip" class="nav-tooltip-text" role="tooltip">Personal Blog site written mainly in Chinese</span>
           </span>
           <a href="/hobby/" aria-current={active === 'hobby' ? 'page' : undefined}>Hobby</a>
-          <button class="icon-button search-trigger" type="button" aria-label="Search this site" title="Search this site"><Icon name="search" size={19} /><kbd data-search-shortcut>Ctrl K</kbd></button>
         </nav>
+        <div class="header-actions">
+          <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-navigation"><Icon name="menu" size={19} /><span>Menu</span></button>
+          <button class="icon-button search-trigger" type="button" aria-label="Search this site" title="Search this site"><Icon name="search" size={19} /><kbd data-search-shortcut>Ctrl K</kbd></button>
+        </div>
       </header>
       <main id="main" tabindex="-1"><slot /></main>
       <footer class="site-footer">
